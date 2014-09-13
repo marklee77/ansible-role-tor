@@ -1,20 +1,21 @@
 ---
-- name: ensure heroku apt key is present 
-  apt_key:
-    url: https://toolbelt.heroku.com/apt/release.key
-    state: present 
+- name: ensure tor repository public key is installed
+  command: apt-key adv --recv-key --keyserver keys.gnupg.net A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 
+  register: apt_key
+  changed_when: apt_key.stderr.find("imported") != -1
 
-- name: ensure heroku repository is enabled
+- name: ensure tor repository is enabled
   apt_repository:
-    repo: deb http://toolbelt.heroku.com/ubuntu ./
+    repo: deb http://deb.torproject.org/torproject.org trusty main
     update_cache: yes
     state: present
 
-- name: ensure heroku-toolbelt is installed
+- name: ensure tor and vidalia installed
   apt: 
     pkg: "{{ item }}" 
     state: latest 
     update_cache: yes 
     cache_valid_time: 600
   with_items:
-    - heroku-toolbelt
+    - tor
+    - vidalia
