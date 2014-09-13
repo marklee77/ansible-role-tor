@@ -1,10 +1,20 @@
 ---
-- include: dependencies.yml
-- include: tools.yml
-- include: libs.yml
-- include: python.yml
-- include: java.yml
-- include: virtualbox.yml
-- include: vagrant.yml
-- include: docker.yml
-- include: heroku.yml
+- name: ensure heroku apt key is present 
+  apt_key:
+    url: https://toolbelt.heroku.com/apt/release.key
+    state: present 
+
+- name: ensure heroku repository is enabled
+  apt_repository:
+    repo: deb http://toolbelt.heroku.com/ubuntu ./
+    update_cache: yes
+    state: present
+
+- name: ensure heroku-toolbelt is installed
+  apt: 
+    pkg: "{{ item }}" 
+    state: latest 
+    update_cache: yes 
+    cache_valid_time: 600
+  with_items:
+    - heroku-toolbelt
