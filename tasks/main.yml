@@ -6,11 +6,11 @@
 
 - name: ensure tor repository is enabled
   apt_repository:
-    repo: deb http://deb.torproject.org/torproject.org trusty main
+    repo: deb http://deb.torproject.org/torproject.org {{ ansible_distribution_release }} main
     update_cache: yes
     state: present
 
-- name: ensure tor and vidalia installed
+- name: ensure tor is installed
   apt: 
     pkg: "{{ item }}" 
     state: latest 
@@ -18,4 +18,3 @@
     cache_valid_time: 600
   with_items:
     - tor
-    - vidalia
