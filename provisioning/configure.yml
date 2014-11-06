@@ -1,0 +1,6 @@
+- hosts: all
+  sudo: True
+  tasks:
+    - include: ../tasks/configure.yml 
+  handlers:
+    - include: ../handlers/main.yml

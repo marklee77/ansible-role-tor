@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Mark Stillwell
-  description: Tor for Ubuntu
+  description: Tor for Ubuntu and/or Docker
   license: GPLv2
   min_ansible_version: 1.2
   platforms:

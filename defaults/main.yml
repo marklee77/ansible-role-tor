@@ -1,0 +1,9 @@
+---
+# The variables below only apply to dockerized deployment
+# NOTE: there seems to be some kind of bug when boolean variables are
+# expressions...
+tor_dockerized_deployment: false
+tor_docker_username: "{{ default_docker_username|default('default') }}"
+tor_docker_build_image: true
+tor_docker_imagename: tor
+tor_docker_containername: mysql

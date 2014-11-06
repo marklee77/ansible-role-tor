@@ -1,0 +1,34 @@
+---
+- name: ensure tor is properly configured
+  lineinfile;
+    dest: /etc/tor/torrc
+    line: "{{ item.key }} {{ item.value }}"
+    regexp: "^{{ item.key }}"
+    state: present
+  with_items:
+    - { key: DNSPort, value: 9053 }
+    - { key: AutomapHostsOnResolve, value: 1 }
+    - { key: AutomapHostsSuffixes, value: ".exit,.onion" }
+  notify:
+    - restart tor
+
+#- name: ensure privoxy is properly configured
+#  lineinfile;
+#    dest: /etc/privoxy/config
+#    line: "{{ item.key }} {{ item.value }}"
+#    regexp: "^{{ item.key }}"
+#    state: present
+#  with_items:
+#  notify:
+#    - restart privoxy
+
+- name: ensure services are started and enabled
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - tor
+    - dnsmasq
+    - privoxy
+    - squid

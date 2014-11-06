@@ -1,1 +1,16 @@
 ---
+- name: restart tor
+  service:
+    name: tor
+    state: restarted
+
+- name: restart privoxy
+  service:
+    name: privoxy
+    state: restarted
+
+# FIXME: if no upstart...
+- name: restart squid
+  service:
+    name: squid3
+    state: restarted

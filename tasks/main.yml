@@ -1,20 +1,11 @@
 ---
-- name: ensure tor repository public key is installed
-  command: apt-key adv --recv-key --keyserver keys.gnupg.net A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 
-  register: apt_key
-  changed_when: apt_key.stderr.find("imported") != -1
+- include: prep.yml
 
-- name: ensure tor repository is enabled
-  apt_repository:
-    repo: deb http://deb.torproject.org/torproject.org {{ ansible_distribution_release }} main
-    update_cache: yes
-    state: present
+- include: docker.yml
+  when: mariadb_dockerized_deployment
 
-- name: ensure tor is installed
-  apt: 
-    pkg: "{{ item }}" 
-    state: latest 
-    update_cache: yes 
-    cache_valid_time: 600
-  with_items:
-    - tor
+- include: install.yml
+  when: not mariadb_dockerized_deployment
+
+- include: configure.yml
+  when: not mariadb_dockerized_deployment 
