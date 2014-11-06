@@ -34,9 +34,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       }
       ansible.playbook = "provisioning/deploy.yml"
     end
-    machine.vm.provision "ansible" do |ansible|
-      ansible.playbook = "provisioning/test.yml"
-    end
+    #machine.vm.provision "ansible" do |ansible|
+    #  ansible.playbook = "provisioning/test.yml"
+    #end
   end
   config.vm.define "docker-pull-image", autostart: false do |machine|
     machine.vm.provider "docker" do |d|
@@ -52,9 +52,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       }
       ansible.playbook = "provisioning/deploy.yml"
     end
-    machine.vm.provision "ansible" do |ansible|
-      ansible.playbook = "provisioning/test.yml"
-    end
+    #machine.vm.provision "ansible" do |ansible|
+    #  ansible.playbook = "provisioning/test.yml"
+    #end
   end
 end
 
