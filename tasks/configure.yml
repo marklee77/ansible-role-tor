@@ -1,6 +1,6 @@
 ---
 - name: ensure tor is properly configured
-  lineinfile;
+  lineinfile:
     dest: /etc/tor/torrc
     line: "{{ item.key }} {{ item.value }}"
     regexp: "^{{ item.key }}"
@@ -12,15 +12,16 @@
   notify:
     - restart tor
 
-#- name: ensure privoxy is properly configured
-#  lineinfile;
-#    dest: /etc/privoxy/config
-#    line: "{{ item.key }} {{ item.value }}"
-#    regexp: "^{{ item.key }}"
-#    state: present
-#  with_items:
-#  notify:
-#    - restart privoxy
+- name: ensure privoxy is properly configured
+  lineinfile:
+    dest: /etc/privoxy/config
+    line: "{{ item.key }} {{ item.value }}"
+    regexp: "^{{ item.key }}"
+    state: present
+  with_items:
+    - { key: forward-socks5t, value: "/ 127.0.0.1:9050 ." }
+  notify:
+    - restart privoxy
 
 - name: ensure services are started and enabled
   service:
@@ -31,4 +32,4 @@
     - tor
     - dnsmasq
     - privoxy
-    - squid
+    - squid3
