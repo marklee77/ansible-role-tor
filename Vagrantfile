@@ -17,6 +17,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
     machine.vm.provision "ansible" do |ansible|
       ansible.playbook = "provisioning/deploy.yml"
+      ansible.extra_vars = {
+        tor_enable_localnet_squid_access: true
+      }
     end
     #machine.vm.provision "ansible" do |ansible|
     #  ansible.playbook = "provisioning/test.yml"
@@ -29,10 +32,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       d.privileged = true
     end
     machine.vm.provision "ansible" do |ansible|
+      ansible.playbook = "provisioning/deploy.yml"
       ansible.extra_vars = {
         tor_dockerized_deployment: true
       }
-      ansible.playbook = "provisioning/deploy.yml"
     end
     #machine.vm.provision "ansible" do |ansible|
     #  ansible.playbook = "provisioning/test.yml"

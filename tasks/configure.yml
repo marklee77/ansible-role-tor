@@ -23,56 +23,98 @@
   notify:
     - restart privoxy
 
+- name: ensure squid forwarded_for is off
+  lineinfile:
+    dest: /etc/squid3/squid.conf
+    line: forwarded_for off
+    regexp: "^forwarded_for "
+    insertafter: "# forwarded_for on"
+    state: present
+  notify:
+    - restart squid
+
+- name: ensure squid via is off
+  lineinfile:
+    dest: /etc/squid3/squid.conf
+    line: via off
+    regexp: "^via "
+    insertafter: "# via on"
+    state: present
+  notify:
+    - restart squid
+
+- name: ensure localnet is defined in squid if local network access is desired
+  lineinfile:
+    dest: /etc/squid3/squid.conf
+    line: "acl localnet src {{ ansible_default_ipv4.network }}/{{ ansible_default_ipv4.netmask }}"
+    insertafter: "^#acl localnet"
+    state: present
+  notify:
+    - restart squid
+  when: tor_enable_localnet_squid_access
+
+- name: ensure that localnet hosts are allowed to access squid
+  lineinfile:
+    dest: /etc/squid3/squid.conf
+    line: "http_access allow localnet"
+    insertbefore: "^http_access deny all"
+    state: present
+  notify:
+    - restart squid
+  when: tor_enable_localnet_squid_access
+
 - name: ensure squid request header access is properly configured
   lineinfile:
     dest: /etc/squid3/squid.conf
-    line: "{{ item }}"
-    regexp: "^{{ item }}$"
+    line: "{{ item.key }} {{ item.value }}"
+    regexp: "^{{ item.key }} "
     insertbefore: "^#  TAG: reply_header_access"
+    state: present
   with_items:
-    - request_header_access Authorization allow all
-    - request_header_access Proxy-Authorization allow all
-    - request_header_access Cache-Control allow all
-    - request_header_access Content-Length allow all
-    - request_header_access Content-Type allow all
-    - request_header_access Date allow all
-    - request_header_access Host allow all
-    - request_header_access If-Modified-Since allow all
-    - request_header_access Pragma allow all
-    - request_header_access Accept allow all
-    - request_header_access Accept-Charset allow all
-    - request_header_access Accept-Encoding allow all
-    - request_header_access Accept-Language allow all
-    - request_header_access Connection allow all
-    - request_header_access All deny all
+    - { key: "request_header_access Authorization", value: "allow all" }
+    - { key: "request_header_access Proxy-Authorization", value: "allow all" }
+    - { key: "request_header_access Cache-Control", value: "allow all" }
+    - { key: "request_header_access Content-Length", value: "allow all" }
+    - { key: "request_header_access Content-Type", value: "allow all" }
+    - { key: "request_header_access Date", value: "allow all" }
+    - { key: "request_header_access Host", value: "allow all" }
+    - { key: "request_header_access If-Modified-Since", value: "allow all" }
+    - { key: "request_header_access Pragma", value: "allow all" }
+    - { key: "request_header_access Accept", value: "allow all" }
+    - { key: "request_header_access Accept-Charset", value: "allow all" }
+    - { key: "request_header_access Accept-Encoding", value: "allow all" }
+    - { key: "request_header_access Accept-Language", value: "allow all" }
+    - { key: "request_header_access Connection", value: "allow all" }
+    - { key: "request_header_access All", value: "deny all" }
   notify:
     - restart squid
 
 - name: ensure squid reply header access is properly configured
   lineinfile:
     dest: /etc/squid3/squid.conf
-    line: "{{ item }}"
-    regexp: "^{{ item }}$"
+    line: "{{ item.key }} {{ item.value }}"
+    regexp: "^{{ item.key }} "
     insertbefore: "^#  TAG: reply_header_replace"
+    state: present
   with_items:
-    - reply_header_access Allow allow all
-    - reply_header_access WWW-Authenticate allow all
-    - reply_header_access Proxy-Authenticate allow all
-    - reply_header_access Cache-Control allow all
-    - reply_header_access Content-Encoding allow all
-    - reply_header_access Content-Length allow all
-    - reply_header_access Content-Type allow all
-    - reply_header_access Date allow all
-    - reply_header_access Expires allow all
-    - reply_header_access Last-Modified allow all
-    - reply_header_access Location allow all
-    - reply_header_access Pragma allow all
-    - reply_header_access Content-Language allow all
-    - reply_header_access Retry-After allow all
-    - reply_header_access Title allow all
-    - reply_header_access Content-Disposition allow all
-    - reply_header_access Connection allow all
-    - reply_header_access All deny all
+    - { key: "reply_header_access", value: "allow all" }
+    - { key: "reply_header_access WWW-Authenticate", value: "allow all" }
+    - { key: "reply_header_access Proxy-Authenticate", value: "allow all" }
+    - { key: "reply_header_access Cache-Control", value: "allow all" }
+    - { key: "reply_header_access Content-Encoding", value: "allow all" }
+    - { key: "reply_header_access Content-Length", value: "allow all" }
+    - { key: "reply_header_access Content-Type", value: "allow all" }
+    - { key: "reply_header_access Date", value: "allow all" }
+    - { key: "reply_header_access Expires", value: "allow all" }
+    - { key: "reply_header_access Last-Modified", value: "allow all" }
+    - { key: "reply_header_access Location", value: "allow all" }
+    - { key: "reply_header_access Pragma", value: "allow all" }
+    - { key: "reply_header_access Content-Language", value: "allow all" }
+    - { key: "reply_header_access Retry-After", value: "allow all" }
+    - { key: "reply_header_access Title", value: "allow all" }
+    - { key: "reply_header_access Content-Disposition", value: "allow all" }
+    - { key: "reply_header_access Connection", value: "allow all" }
+    - { key: "reply_header_access All", value: "deny all" }
   notify:
     - restart squid
 
@@ -80,14 +122,15 @@
   lineinfile:
     dest: /etc/squid3/squid.conf
     line: "{{ item.key }} {{ item.value }}"
-    regexp: "^{{ item.key }}"
+    regexp: "^{{ item.key }} "
     insertbefore: "^#  TAG: cache_peer_domain"
+    state: present
   with_items:
     - { key: cache_peer, value: "localhost parent 8118 0 no-query" }
   notify:
     - restart squid
  
-- name: ensureeservices are started and enabled
+- name: ensure services are started and enabled
   service:
     name: "{{ item }}"
     state: started

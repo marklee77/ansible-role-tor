@@ -1,4 +1,6 @@
 ---
+tor_enable_localnet_squid_access: false
+
 # The variables below only apply to dockerized deployment
 # NOTE: there seems to be some kind of bug when boolean variables are
 # expressions...
